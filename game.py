@@ -10,7 +10,6 @@ done = False
 clock = pygame.time.Clock()
 FRAME_RATE = 60
 
-#-----------------------------------------------------------------------
 
 universe = Universe()
 
@@ -36,7 +35,8 @@ while not done:
 			if event.key == pygame.K_DOWN:
 				universe.dinoSetDuck(True)
 			if event.key == pygame.K_SPACE:
-				universe.addItem('cactus')
+				universe.addItem('cluster')
+				universe.addItem('cloud')
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_DOWN:
 				universe.dinoSetDuck(False)

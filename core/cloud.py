@@ -3,8 +3,8 @@ import pygame
 class Cloud(object):
 
 	def __init__(self, position, path='resources/images/'):
-		pose = pygame.image.load(path + 'cloud.png')
-		self.position = [1000, position]
+		self.pose = pygame.image.load(path + 'cloud.png')
+		self.position = position
 
 	def update(self, velocity):
 		self.position[0] -= velocity
@@ -13,4 +13,4 @@ class Cloud(object):
 		screen.blit(self.pose, tuple(self.position))
 
 	def isAlive(self):
-		return self.position[0] < -60
+		return self.position[0] > -200

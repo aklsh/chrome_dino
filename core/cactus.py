@@ -2,12 +2,13 @@ import pygame
 
 class Cactus(object):
 
-	def __init__(self, size=False, type=1, path='resources/images/'):
+	def __init__(self, size=False, type=1, offset=0, path='resources/images/'):
 		self.pose = pygame.image.load(path + 'cactus' + str(type) + '.png')
 		self.size = size
+		self.position = [1000 + offset, 230]
 		if size:
-			self.pose = pygame.transform.scale(self.pose, (10, 20))
-		self.position = [1000, 230]
+			self.position[1] += 48
+			self.pose = pygame.transform.scale(self.pose, (60, 72))
 
 	def update(self, velocity):
 		self.position[0] -= velocity
@@ -16,7 +17,7 @@ class Cactus(object):
 		screen.blit(self.pose, tuple(self.position))
 
 	def isAlive(self):
-		return self.position[0] > -60
+		return self.position[0] > -100
 
 	def colliding(self, point):
 		if point[0] > self.position[0] + 5:
