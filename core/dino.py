@@ -11,6 +11,9 @@ class Dino(object):
 		self.velocity = 0
 		self.jumpActive = False
 		self.duckActive = False
+		self.bodyPoints = [[115, 260], [100, 300]]
+		self.bodyPointsDuck = [[125, 320], [125, 290]]
+		self.bodyPointsJump = [[115, 260], [100, 300], [25, 305]]
 
 	def jump(self):
 		if not self.jumpActive and not self.duckActive:
@@ -32,9 +35,29 @@ class Dino(object):
 			self.time = pygame.time.get_ticks()
 			self.legPosition = not self.legPosition
 
+		points = self.bodyPoints
+		if self.duckActive:
+			points = self.bodyPointsDuck
+		if self.jumpActive:
+			points = [[115, 260], [100, 300], [25, 305]]
+			for point in points:
+				point[1] -= self.position
+
+		return points
+
 	def show(self, screen : pygame.Surface):
 		if self.jumpActive:
 			screen.blit(self.poses['jump'], (20, 250 - self.position))
 		else:
 			key = 'duck' if self.duckActive else 'run'
 			screen.blit(self.poses[key][self.legPosition], (0 if self.duckActive else 20, 250 - self.position))
+
+		if self.duckActive:
+			for point in self.bodyPointsDuck:
+				pygame.draw.circle(screen, (0, 0, 255), point, 4)
+		elif self.jumpActive:
+			for point in self.bodyPointsJump:
+				pygame.draw.circle(screen, (0, 0, 255), (point[0], point[1] - self.position), 4)
+		else:
+			for point in self.bodyPoints:
+				pygame.draw.circle(screen, (0, 0, 255), point, 4)

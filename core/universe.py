@@ -15,16 +15,20 @@ class Universe(object):
 		self.dino = Dino()
 		self.birds = []
 		self.birdTime = 0.
-		self.newBirdLimit = 0.5
+		self.newBirdLimit = 5
 		self.cacti = []
 		self.cactusTime = 0.
-		self.newCactusLimit = 500
+		self.newCactusLimit = 0.5
 		self.clouds = []
+		self.isAlive = True
 		self.addItem('cloud')
 
 	def addItem(self, item : str):
+		if item == 'cactus':
+			self.cacti.append(Cactus(size=(random.random() < 0.5), type=random.randint(1, 3)))
+
 		if item == 'cluster':
-			if (random.random() < 0.8):
+			if (random.random() < 0.7):
 				self.cacti.append(Cactus(type=random.randint(1, 3)))
 				self.cacti.append(Cactus(type=random.randint(1, 3), offset=60))
 				self.cacti.append(Cactus(type=random.randint(1, 3), offset=120))
@@ -43,6 +47,7 @@ class Universe(object):
 		self.velocity = velocity
 
 	def update(self):
+		points = self.dino.update()
 		for cloud in self.clouds:
 			cloud.update(0.5 * self.velocity)
 			if not cloud.isAlive():
@@ -50,13 +55,16 @@ class Universe(object):
 				self.addItem('cloud')
 		for cactus in self.cacti:
 			cactus.update(self.velocity)
+			for point in points:
+				self.isAlive = self.isAlive and not cactus.colliding(point)
 			if not cactus.isAlive():
 				self.cacti.remove(cactus)
 		for bird in self.birds:
 			bird.update(1.2 * self.velocity)
+			for point in points:
+				self.isAlive = self.isAlive and not bird.colliding(point)
 			if not bird.isAlive():
 				self.birds.remove(bird)
-		self.dino.update()
 		self.score += 0.15
 		self.birdTime += 1e-3
 		self.cactusTime += 1e-3
@@ -64,7 +72,10 @@ class Universe(object):
 			self.addItem('bird')
 			self.birdTime = 0
 		if (random.random() < (self.cactusTime / self.newCactusLimit)**2):
-			self.addItem('cluster')
+			if (random.random() < 0.8):
+				self.addItem('cluster')
+			else:
+				self.addItem('cactus')
 			self.cactusTime = 0
 
 
@@ -79,6 +90,9 @@ class Universe(object):
 			bird.show(screen)
 		self.dino.show(screen)
 		screen.blit(self.font.render(str(int(self.score)).zfill(5), False, (51, 51, 51)), (880, 20))
+		if not self.isAlive:
+			pygame.draw.circle(screen, (255, 0, 0), (500, 200), 20)
+			self.isAlive = True
 
 	def dinoJump(self):
 		self.dino.jump()
