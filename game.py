@@ -14,16 +14,16 @@ FRAME_RATE = 60
 universe = Universe()
 
 def setup():
-	pass
+	global universe
+	universe = Universe()
 
 def draw():
 	SCREEN.fill((245, 245, 245))
-	universe.update()
-	universe.show(SCREEN)
+	if(universe.show(SCREEN)):
+		universe.update()
 
 #-----------------------------------------------------------------------
 
-setup()
 while not done:
 	draw()
 	for event in pygame.event.get():
@@ -35,10 +35,15 @@ while not done:
 			if event.key == pygame.K_DOWN:
 				universe.dinoSetDuck(True)
 			if event.key == pygame.K_SPACE:
-				universe.addItem('cluster')
-				universe.addItem('cloud')
+				if universe.isAlive:
+					universe.dinoJump()
+				else:
+					setup()
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_DOWN:
 				universe.dinoSetDuck(False)
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			if not universe.isAlive:
+				setup()
 	pygame.display.flip()
 	clock.tick(FRAME_RATE)

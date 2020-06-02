@@ -15,9 +15,10 @@ class Cactus(object):
 	def update(self, velocity):
 		self.position[0] -= velocity
 
-	def show(self, screen : pygame.Surface):
+	def show(self, screen : pygame.Surface, showBBox=False):
 		screen.blit(self.pose, tuple(self.position))
-		pygame.draw.rect(screen, (0, 255, 0), (self.position[0] + self.bbox[0], self.position[1] + self.bbox[1], self.bbox[2], self.bbox[3]), 2)
+		if showBBox:
+			pygame.draw.rect(screen, (0, 255, 0), (self.position[0] + self.bbox[0], self.position[1] + self.bbox[1], self.bbox[2], self.bbox[3]), 2)
 
 	def isAlive(self):
 		return self.position[0] > -100

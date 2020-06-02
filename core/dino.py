@@ -4,6 +4,7 @@ class Dino(object):
 
 	def __init__(self, path='resources/images/'):
 		self.poses = {'run' :[pygame.image.load(path + 'run1.png'), pygame.image.load(path + 'run2.png')], 'duck' : [pygame.image.load(path + 'duck1.png'), pygame.image.load(path + 'duck2.png')], 'jump' : pygame.image.load(path + 'jump.png')}
+		self.deadPose = pygame.image.load(path + 'dead.png')
 		self.legPosition = False
 		self.time = 0
 		self.position = 0
@@ -45,19 +46,23 @@ class Dino(object):
 
 		return points
 
-	def show(self, screen : pygame.Surface):
-		if self.jumpActive:
-			screen.blit(self.poses['jump'], (20, 250 - self.position))
+	def show(self, screen: pygame.Surface, isAlive: bool, showBodyPoints=False):
+		if isAlive:
+			if self.jumpActive:
+				screen.blit(self.poses['jump'], (20, 250 - self.position))
+			else:
+				key = 'duck' if self.duckActive else 'run'
+				screen.blit(self.poses[key][self.legPosition], (0 if self.duckActive else 20, 250))
 		else:
-			key = 'duck' if self.duckActive else 'run'
-			screen.blit(self.poses[key][self.legPosition], (0 if self.duckActive else 20, 250 - self.position))
+			screen.blit(self.deadPose, (20, 250 - self.position))
 
-		if self.duckActive:
-			for point in self.bodyPointsDuck:
-				pygame.draw.circle(screen, (0, 0, 255), point, 4)
-		elif self.jumpActive:
-			for point in self.bodyPointsJump:
-				pygame.draw.circle(screen, (0, 0, 255), (point[0], point[1] - self.position), 4)
-		else:
-			for point in self.bodyPoints:
-				pygame.draw.circle(screen, (0, 0, 255), point, 4)
+		if showBodyPoints:
+			if self.duckActive:
+				for point in self.bodyPointsDuck:
+					pygame.draw.circle(screen, (0, 0, 255), point, 4)
+			elif self.jumpActive:
+				for point in self.bodyPointsJump:
+					pygame.draw.circle(screen, (0, 0, 255), (point[0], point[1] - self.position), 4)
+			else:
+				for point in self.bodyPoints:
+					pygame.draw.circle(screen, (0, 0, 255), point, 4)

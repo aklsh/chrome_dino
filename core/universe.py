@@ -4,14 +4,16 @@ from .dino import Dino
 from .bird import Bird
 from .cloud import Cloud
 from .cactus import Cactus
+from playsound import playsound
 
 class Universe(object):
 
-	def __init__(self, velocity=15):
+	def __init__(self, velocity=15.):
 		self.font = pygame.font.Font('resources/fonts/P2P.ttf', 20)
 		self.groundPosition = 320
 		self.velocity = velocity
-		self.score = 0
+		self.score = 1
+		self.reload = pygame.image.load('resources/images/reload.png')
 		self.dino = Dino()
 		self.birds = []
 		self.birdTime = 0.
@@ -43,9 +45,6 @@ class Universe(object):
 		if item == 'bird':
 			self.birds.append(Bird(220))
 
-	def setVelocity(self, velocity):
-		self.velocity = velocity
-
 	def update(self):
 		points = self.dino.update()
 		for cloud in self.clouds:
@@ -66,6 +65,13 @@ class Universe(object):
 			if not bird.isAlive():
 				self.birds.remove(bird)
 		self.score += 0.15
+		if (self.score / 100.) - int(self.score / 100.) <= 0.0015:
+			playsound('resources/sounds/point.wav', False)
+			self.velocity += 1.25
+			factor = (self.velocity - 1.25) / self.velocity
+			self.cactusTime *= factor
+			self.birdTime *= factor
+
 		self.birdTime += 1e-3
 		self.cactusTime += 1e-3
 		if (random.random() < (self.birdTime / self.newBirdLimit)**2):
@@ -77,6 +83,8 @@ class Universe(object):
 			else:
 				self.addItem('cactus')
 			self.cactusTime = 0
+		if not self.isAlive:
+			playsound('resources/sounds/over.wav', False)
 
 
 	def show(self, screen : pygame.Surface):
@@ -88,11 +96,12 @@ class Universe(object):
 			cactus.show(screen)
 		for bird in self.birds:
 			bird.show(screen)
-		self.dino.show(screen)
+		self.dino.show(screen, self.isAlive)
 		screen.blit(self.font.render(str(int(self.score)).zfill(5), False, (51, 51, 51)), (880, 20))
 		if not self.isAlive:
-			pygame.draw.circle(screen, (255, 0, 0), (500, 200), 20)
-			self.isAlive = True
+			screen.blit(self.font.render('G A M E  O V E R', False, (51, 51, 51)), (350, 100))
+			screen.blit(self.reload, (490, 150))
+		return self.isAlive
 
 	def dinoJump(self):
 		self.dino.jump()
